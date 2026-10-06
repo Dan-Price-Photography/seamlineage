@@ -44,6 +44,6 @@ JSON allows, and readers accept anything JSON allows.
   files never are.)
 - **Writers may escape** characters that are invisible or ambiguous in a diff (for example U+007F, U+00A0, U+2028,
   U+2029, U+FEFF) and characters outside the Basic Multilingual Plane (as a `\uXXXX\uXXXX` surrogate pair).
-- **Readers must accept** any valid JSON escaping, including `'` for `'`, from older files or other writers.
+- **Readers must accept** any valid JSON escaping, including `\u0027` for `'`, from older files or other writers.
 
 Escaping never changes meaning: two documents that differ only in escaping are JSON-equal.

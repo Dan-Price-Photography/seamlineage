@@ -35,7 +35,7 @@ public class WireJsonTests
     [Fact]
     public void Reads_any_valid_escaping()
     {
-        var note = JsonSerializer.Deserialize<Note>("""{ "text": "the picker's <first> & last → done, café" }""", WireJson.Options);
+        var note = JsonSerializer.Deserialize<Note>("""{ "text": "the picker\u0027s \u003Cfirst\u003E \u0026 last \u2192 done, caf\u00e9" }""", WireJson.Options);
 
         Assert.Equal(Readable, note!.Text);
     }
