@@ -1,0 +1,6 @@
+{
+  "groups": [
+    { "label": "loner", "items": [ { "id": "a" } ] },
+    { "label": "loner", "items": [ { "id": "b" } ] }
+  ]
+}

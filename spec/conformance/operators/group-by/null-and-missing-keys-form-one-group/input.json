@@ -1,0 +1,9 @@
+{
+  "parameters": { "key": "room" },
+  "items": [
+    { "id": "a", "room": "x" },
+    { "id": "b", "room": null },
+    { "id": "c" },
+    { "id": "d", "room": "x" }
+  ]
+}

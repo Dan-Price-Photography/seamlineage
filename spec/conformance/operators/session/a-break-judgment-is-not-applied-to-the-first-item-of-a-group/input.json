@@ -1,0 +1,6 @@
+{
+  "parameters": { "at": "at", "maxGapSeconds": 120, "breakWhen": [ "kindChanges" ] },
+  "groups": [
+    [ { "id": "a", "at": "2026-01-01T12:00:00", "kindChanges": true }, { "id": "b", "at": "2026-01-01T12:01:00", "kindChanges": false } ]
+  ]
+}

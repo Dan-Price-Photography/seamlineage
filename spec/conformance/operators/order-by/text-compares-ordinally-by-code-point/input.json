@@ -1,0 +1,6 @@
+{
+  "parameters": { "by": [ "name" ] },
+  "groups": [
+    [ { "name": "b" }, { "name": "_" }, { "name": "B" }, { "name": "a" }, { "name": "é" }, { "name": "10" }, { "name": "9" } ]
+  ]
+}

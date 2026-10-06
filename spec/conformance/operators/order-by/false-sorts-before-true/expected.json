@@ -1,0 +1,3 @@
+{
+  "groups": [ [ { "id": "b", "late": false }, { "id": "a", "late": true } ] ]
+}

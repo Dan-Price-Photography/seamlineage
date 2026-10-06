@@ -1,0 +1,4 @@
+{
+  "parameters": { "by": [ "rank" ] },
+  "groups": [ [ { "id": "a", "rank": 1 } ] ]
+}

@@ -1,0 +1,8 @@
+{
+  "groups": [
+    { "label": "loner", "items": [ { "id": "a" } ] },
+    { "label": "loner", "items": [ { "id": "b" } ] },
+    { "label": "crowd", "items": [ { "id": "c" }, { "id": "d" }, { "id": "e" } ] },
+    { "label": "loner", "items": [ { "id": "f" } ] }
+  ]
+}
