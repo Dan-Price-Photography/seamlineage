@@ -31,3 +31,19 @@ fixtures/
 - Field names are camelCase; enum values are camelCase strings.
 - `datetime` values are ISO 8601 with offset (`2026-10-01T21:42:25+00:00`); `localdatetime` values have no offset.
 - Optional values that are absent are written as `null`.
+
+### Escaping
+
+Every file in these formats (examples, recordings, the manifest) is read in diffs, so writers escape as little as
+JSON allows, and readers accept anything JSON allows.
+
+- **Writers must escape** `"`, `\` and the control characters U+0000 to U+001F, preferring the short forms (`\"`,
+  `\`, `\n`, `\r`, `\t`, `\b`, `\f`).
+- **Writers must not escape** other printable text: `'`, `&`, `<`, `>`, `+`, `` ` `` and printable non-ASCII text such
+  as `é` or `→` are written as themselves. (Escaping these is only useful when embedding JSON in HTML, which these
+  files never are.)
+- **Writers may escape** characters that are invisible or ambiguous in a diff (for example U+007F, U+00A0, U+2028,
+  U+2029, U+FEFF) and characters outside the Basic Multilingual Plane (as a `\uXXXX\uXXXX` surrogate pair).
+- **Readers must accept** any valid JSON escaping, including `'` for `'`, from older files or other writers.
+
+Escaping never changes meaning: two documents that differ only in escaping are JSON-equal.

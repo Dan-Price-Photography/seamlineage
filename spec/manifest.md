@@ -2,7 +2,9 @@
 
 `graph.manifest.json` describes one graph: its stages in order, what each decides, and the shape of every type that
 crosses an edge. It is generated from code and committed, so a pull request shows how the product's structure
-changed. Implementations must generate it deterministically (stable ordering, stable formatting).
+changed. Implementations must generate it deterministically (stable ordering, stable formatting), with the minimal
+escaping of the wire format ([examples.md](examples.md#escaping)): a description reads `the picker's watch`, never
+`the picker's watch`. Readers must accept any valid JSON escaping.
 
 ## Top level
 
