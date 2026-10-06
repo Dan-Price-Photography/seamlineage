@@ -49,8 +49,8 @@
       ],
       "judgments": {
         "row": "The row part of the tree id (row-3 of row-3/tree-12), so a basket never spans rows.",
-        "picked-at": "When the fruit was picked by the picker\u0027s watch; none if it was not noted.",
-        "id": "The pick\u0027s id, which keeps log order among picks noted at the same minute.",
+        "picked-at": "When the fruit was picked by the picker's watch; none if it was not noted.",
+        "id": "The pick's id, which keeps log order among picks noted at the same minute.",
         "variety-changes": "The pick is a different variety from the one before it, so a basket holds one variety."
       }
     },

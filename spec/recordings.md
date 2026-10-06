@@ -11,7 +11,8 @@ recordings/<run-id>/NN-<edge>.jsonl
 
 - `NN` is the edge index: `00` is the graph's input; `NN` (1, 2, …) is the output of the NN-th stage.
 - `<edge>` is `input` for edge 00, otherwise the stage name.
-- Each line is one **envelope** (JSON, no line breaks inside).
+- Each line is one **envelope** (JSON, no line breaks inside), escaped minimally like every wire file
+  ([examples.md](examples.md#escaping)); readers accept any valid JSON escaping.
 
 ## Envelope
 
