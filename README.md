@@ -130,7 +130,7 @@ a .NET tool (`dotnet pack src/Seamlineage.Cli`, then `dotnet tool install`), or 
 |---|---|---|
 | 0 | Prove the approach on a real application (photo import: scan, group, detect exposure brackets), including an AI-authored stage reviewed from diagram and examples first | Done, in a private proving-ground repo |
 | 1 | Draft spec v0: manifest, examples, recordings, diagram rules | In progress ([`spec/`](spec/)) |
-| 2 | Conformance suite, starting with the building blocks (group-by, order-by, session, split-small-groups) | Next |
+| 2 | Conformance suite, starting with the building blocks (group-by, order-by, session, split-small-groups) | Done for the operators: [`spec/operators.md`](spec/operators.md) and [`spec/conformance/`](spec/conformance/) (39 cases, all passed by the C# reference); stages and hosts next |
 | 3 | C# reference implementation and the shared CLI, extracted from the proving ground | In progress: contracts, operators, test helpers, in-process host and the `seamlineage` CLI (`graph`, `check`) are done, dogfooded by [`samples/harvest`](samples/harvest/); publishing the packages is next |
 | 4 | Pipeline text and example tables in generated docs | Done: one page per stage ([example](samples/harvest/graph/group-baskets.md)), see [`spec/diagram.md`](spec/diagram.md) |
 | 5 | Per-PR change diagram: only changed stages and their neighbours, highlighted | Planned |

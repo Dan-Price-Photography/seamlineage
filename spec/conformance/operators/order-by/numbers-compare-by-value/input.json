@@ -1,0 +1,6 @@
+{
+  "parameters": { "by": [ "size" ] },
+  "groups": [
+    [ { "size": 10 }, { "size": 2 }, { "size": 1.5 }, { "size": -3 } ]
+  ]
+}

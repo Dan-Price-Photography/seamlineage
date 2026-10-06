@@ -1,0 +1,5 @@
+{
+  "groups": [
+    [ { "id": "d", "rank": 1 }, { "id": "b", "rank": 2 }, { "id": "a", "rank": null }, { "id": "c" } ]
+  ]
+}

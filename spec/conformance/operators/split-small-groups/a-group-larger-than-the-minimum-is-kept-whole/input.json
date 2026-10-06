@@ -1,0 +1,4 @@
+{
+  "parameters": { "minimum": 3, "keptAs": "crowd", "splitAs": "loner" },
+  "groups": [ [ { "id": "a" }, { "id": "b" }, { "id": "c" }, { "id": "d" } ] ]
+}

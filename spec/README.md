@@ -13,7 +13,7 @@ version recorded in each file.
 | [examples.md](examples.md) | `fixtures/<stage>/<case>/input.json` and `expected.json`; the wire format; example views | Draft | Run by `Seamlineage.Testing` (`Fixtures`) |
 | [recordings.md](recordings.md) | Edge recordings: one envelope per line, per edge | Draft | Written by `Seamlineage.Hosting.InProc` (`EdgeRecorder`), promoted by `FixturePromoter` |
 | [diagram.md](diagram.md) | `GRAPH.md` and the stage pages `graph/<stage>.md`: Mermaid rules, pipeline text, example tables, checks | Draft | `seamlineage graph`, `seamlineage check` (`Seamlineage.Docs`) |
-| operators.md + conformance/ | The building blocks, each defined by examples every implementation must pass | Planned | `Seamlineage.Operators` (unit tests only so far) |
+| [operators.md](operators.md) + [conformance/](conformance/) | The building blocks (group-by, order-by, session, split-small-groups), each defined by examples every implementation must pass | Draft | `Seamlineage.Operators`, run against the suite by `ConformanceTests` |
 
 ## Principles the formats serve
 
