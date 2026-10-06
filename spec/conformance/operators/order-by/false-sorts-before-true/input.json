@@ -1,0 +1,4 @@
+{
+  "parameters": { "by": [ "late" ] },
+  "groups": [ [ { "id": "a", "late": true }, { "id": "b", "late": false } ] ]
+}

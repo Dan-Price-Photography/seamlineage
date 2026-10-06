@@ -1,0 +1,6 @@
+{
+  "groups": [
+    [ { "id": "a", "floor": 1 }, { "id": "c", "floor": 1 } ],
+    [ { "id": "b", "floor": 2 } ]
+  ]
+}

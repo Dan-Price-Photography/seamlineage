@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>seamlineage</AssemblyName>
     <RootNamespace>Seamlineage.Cli</RootNamespace>
-    <Description>The shared Seamlineage CLI: reads a graph.manifest.json from any implementation language and writes or checks GRAPH.md.</Description>
+    <Description>The shared Seamlineage CLI: reads a graph.manifest.json from any implementation language and writes or checks GRAPH.md and a page per stage.</Description>
 
     <!-- dotnet tool: dotnet pack, then dotnet tool install seamlineage -->
     <PackAsTool>true</PackAsTool>

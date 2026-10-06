@@ -8,6 +8,8 @@ public static class OrderByOperator
         "Sorts the items within each group by the keys in turn, keeping the original order for ties; an item with no "
         + "value for a key sorts after those with one, and text compares ordinally.";
 
+    public const string Phrase = "order each group by {by}";
+
     public static Pipeline<TIn, IReadOnlyList<IReadOnlyList<T>>> OrderBy<TIn, T, TKey>(
         this Pipeline<TIn, IReadOnlyList<IReadOnlyList<T>>> pipeline, Judgment<Func<T, TKey>> by) =>
         pipeline.Then(Step(by.Info), Sort(KeyComparer<T, TKey>(by.Apply)));
@@ -22,7 +24,7 @@ public static class OrderByOperator
     }
 
     private static StepInfo Step(params JudgmentInfo[] keys) =>
-        new("order-by", Description, [new("by", string.Join(", ", keys.Select(k => k.Name)))], keys);
+        new("order-by", Description, [new("by", string.Join(", then ", keys.Select(k => k.Name)))], keys, Phrase);
 
     // Enumerable.Order is a stable sort.
     private static Func<IReadOnlyList<IReadOnlyList<T>>, IReadOnlyList<IReadOnlyList<T>>> Sort<T>(IComparer<T> comparer) =>

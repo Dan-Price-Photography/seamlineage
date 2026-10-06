@@ -90,8 +90,27 @@ public class GraphDiagramTests
 
         Assert.Contains("| Stage | What it decides | Code | Examples |", markdown);
         Assert.Contains(
-            """| **grow** | Turns a seed into a \| b "tree". | [Grow.cs](src/Demo/Grow.cs) | [2 cases](fixtures/grow/) |""",
+            """| [**grow**](graph/grow.md) | Turns a seed into a \| b "tree". | [Grow.cs](src/Demo/Grow.cs) | [2 cases](fixtures/grow/) |""",
             markdown);
+    }
+
+    [Fact]
+    public void Links_each_stage_to_its_page()
+    {
+        var markdown = GraphDiagram.FromManifest(Manifest, options: new DiagramOptions { PagesLink = "docs/stages" });
+
+        Assert.Contains("| [**grow**](docs/stages/grow.md) |", markdown);
+        Assert.Contains("Each arrow above, with its page", markdown);
+    }
+
+    [Fact]
+    public void Lists_operators_written_as_a_description_with_a_phrase()
+    {
+        var markdown = GraphDiagram.FromManifest(ComposedManifest.Replace(
+            "\"group-by\": \"Splits items into groups by key.\"",
+            "\"group-by\": { \"description\": \"Splits items into groups by key.\", \"phrase\": \"group by {key}\" }"));
+
+        Assert.Contains("| **group-by** | Splits items into groups by key. |", markdown);
     }
 
     [Fact]

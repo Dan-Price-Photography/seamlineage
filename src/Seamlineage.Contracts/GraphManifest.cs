@@ -25,7 +25,7 @@ public static class GraphManifest
     {
         codePath ??= ConventionalCodePath;
         var types = new SortedDictionary<string, JsonNode>(StringComparer.Ordinal);
-        var operators = new SortedDictionary<string, string>(StringComparer.Ordinal);
+        var operators = new SortedDictionary<string, JsonObject>(StringComparer.Ordinal);
         var stages = new JsonArray();
 
         Describe(graph.InputType, types);
@@ -40,7 +40,12 @@ public static class GraphManifest
                 ["schemaVersion"] = stage.SchemaVersion,
                 ["code"] = codePath(stage.StageType),
             };
-            if (stage.Steps is { } steps) DescribeSteps(steps, node, operators);
+            if (stage.Steps is { } steps)
+            {
+                node["items"] = stage.Items ?? "items";
+                DescribeSteps(steps, node, operators);
+            }
+            if (stage.ExampleView is { } view) node["exampleView"] = DescribeView(view);
             stages.Add(node);
             Describe(stage.OutputType, types);
         }
@@ -57,13 +62,16 @@ public static class GraphManifest
         return manifest.ToJsonString(Output) + "\n";
     }
 
-    // A composed stage's logic as data: its steps in order, each judgment it uses once, and (graph-wide) each operator.
-    private static void DescribeSteps(IReadOnlyList<StepInfo> steps, JsonObject stage, IDictionary<string, string> operators)
+    // A composed stage's logic as data: its steps in order, each judgment it uses once, and (graph-wide) each operator
+    // with what it does and how one of its steps reads as a line of pipeline text.
+    private static void DescribeSteps(IReadOnlyList<StepInfo> steps, JsonObject stage, IDictionary<string, JsonObject> operators)
     {
         var judgments = new JsonObject();
         stage["steps"] = new JsonArray(steps.Select(step =>
         {
-            operators[step.Operator] = step.OperatorDescription;
+            var entry = new JsonObject { ["description"] = step.OperatorDescription };
+            if (step.OperatorPhrase is { } phrase) entry["phrase"] = phrase;
+            operators[step.Operator] = entry;
             foreach (var judgment in step.Judgments.Where(j => !judgments.ContainsKey(j.Name)))
                 judgments[judgment.Name] = judgment.Description;
             return (JsonNode)new JsonObject
@@ -74,6 +82,23 @@ public static class GraphManifest
         }).ToArray());
         stage["judgments"] = judgments;
     }
+
+    private static JsonObject DescribeView(ExampleView view)
+    {
+        var node = new JsonObject { ["rows"] = view.Rows, ["columns"] = Columns(view.Columns) };
+        if (view.Outcome is { } outcome)
+        {
+            var described = new JsonObject { ["from"] = outcome.From };
+            if (outcome.Members is { } members) described["members"] = members;
+            described["match"] = outcome.Match;
+            described["columns"] = Columns(outcome.Columns);
+            node["outcome"] = described;
+        }
+        return node;
+    }
+
+    private static JsonArray Columns(IReadOnlyList<ExampleColumn> columns) =>
+        new([.. columns.Select(c => (JsonNode)new JsonObject { ["label"] = c.Label, ["path"] = c.Path })]);
 
     private static void Describe(Type type, IDictionary<string, JsonNode> types)
     {

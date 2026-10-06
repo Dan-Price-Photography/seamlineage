@@ -1,0 +1,7 @@
+{
+  "groups": [
+    [ { "id": "a", "room": "x" }, { "id": "c", "room": "x" }, { "id": "f", "room": "x" } ],
+    [ { "id": "b", "room": "y" }, { "id": "e", "room": "y" } ],
+    [ { "id": "d", "room": "z" } ]
+  ]
+}

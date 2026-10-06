@@ -18,9 +18,9 @@ jobs:
       - name: Build
         run: dotnet build Seamlineage.slnx --configuration Release
 
-      # Dogfood the whole loop on the sample: the product's host writes the manifest, the shared CLI draws GRAPH.md
-      # from it. Publish both, so a stale file can be fixed by downloading the job's output.
-      - name: Regenerate the sample's graph.manifest.json and GRAPH.md
+      # Dogfood the whole loop on the sample: the product's host writes the manifest, the shared CLI draws GRAPH.md and
+      # the stage pages from it. Publish them, so a stale file can be fixed by downloading the job's output.
+      - name: Regenerate the sample's graph.manifest.json, GRAPH.md and stage pages
         working-directory: samples/harvest
         run: |
           dotnet run --no-build --configuration Release --project src/Harvest.Host -- manifest
@@ -34,9 +34,17 @@ jobs:
           path: |
             samples/harvest/graph.manifest.json
             samples/harvest/GRAPH.md
+            samples/harvest/graph/
 
+      # Changed, added or deleted: any difference means the committed copies are stale.
       - name: Generated files are committed and current
-        run: git diff --exit-code -- samples/harvest/graph.manifest.json samples/harvest/GRAPH.md
+        run: |
+          generated="samples/harvest/graph.manifest.json samples/harvest/GRAPH.md samples/harvest/graph"
+          if [ -n "$(git status --porcelain -- $generated)" ]; then
+            git status --porcelain -- $generated
+            git diff -- $generated
+            exit 1
+          fi
 
       - name: Test
         run: dotnet test Seamlineage.slnx --no-build --configuration Release

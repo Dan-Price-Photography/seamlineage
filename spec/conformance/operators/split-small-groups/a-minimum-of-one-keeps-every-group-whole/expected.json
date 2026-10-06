@@ -1,0 +1,6 @@
+{
+  "groups": [
+    { "label": "crowd", "items": [ { "id": "a" } ] },
+    { "label": "crowd", "items": [ { "id": "b" }, { "id": "c" } ] }
+  ]
+}

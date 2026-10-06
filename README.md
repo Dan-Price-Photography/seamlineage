@@ -30,7 +30,9 @@ From the graph, the tools generate artifacts a reviewer reads *before* the code:
 - **a manifest** (`graph.manifest.json`): every stage, what it decides, the shape of every edge, and, for stages
   built from reusable building blocks, their steps and parameters;
 - **a diagram** (`GRAPH.md`, Mermaid, rendered by GitHub): the product as a picture, with links from each stage to
-  its code and its examples;
+  its page, its code and its examples;
+- **a page per stage** (`graph/<stage>.md`): *how* the stage decides, as plain-words pipeline text, and *what* it
+  decides on each example, as a table of input → outcome rather than JSON;
 - **examples** (`fixtures/<stage>/<case>/input.json` → `expected.json`): each folder is a test, and any real
   recording can be promoted into one with a single command.
 
@@ -90,7 +92,8 @@ Code is the last resort, not the default. Examples cover all three layers.
 
 [`samples/harvest`](samples/harvest/) is a toy product that uses the whole loop: an orchard's pick log is checked,
 grouped into baskets (a stage composed from generic operators) and weighed. Start with its
-[GRAPH.md](samples/harvest/GRAPH.md), then its [manifest](samples/harvest/graph.manifest.json) and
+[GRAPH.md](samples/harvest/GRAPH.md) and the page of its composed stage,
+[group-baskets](samples/harvest/graph/group-baskets.md), then its [manifest](samples/harvest/graph.manifest.json) and
 [examples](samples/harvest/fixtures/).
 
 ```bash
@@ -99,7 +102,7 @@ dotnet test Seamlineage.slnx                                   # every example i
 cd samples/harvest
 dotnet run --project src/Harvest.Host -- manifest              # the product writes graph.manifest.json
 dotnet run --project ../../src/Seamlineage.Cli -- graph \
-  --manifest graph.manifest.json --fixtures fixtures --out GRAPH.md   # the shared CLI draws GRAPH.md
+  --manifest graph.manifest.json --fixtures fixtures --out GRAPH.md   # the shared CLI draws GRAPH.md and graph/*.md
 dotnet run --project ../../src/Seamlineage.Cli -- check \
   --manifest graph.manifest.json --fixtures fixtures --out GRAPH.md   # exit 1 if stale or a link is broken
 ```
@@ -120,7 +123,7 @@ even for public packages) and how a release is made.
 |---|---|
 | `Seamlineage.Contracts` | Stage, effect, envelope, state-store contract, graph builder, composed-stage steps, wire JSON, manifest emitter. BCL only. |
 | `Seamlineage.Operators` | The generic building blocks: group-by, order-by, session, split-small-groups. |
-| `Seamlineage.Docs` | GRAPH.md from a manifest (Mermaid), and the checks on a committed copy. BCL only. |
+| `Seamlineage.Docs` | GRAPH.md and the stage pages from a manifest (Mermaid, pipeline text, example tables), and the checks on committed copies. BCL only. |
 | `Seamlineage.Testing` | Test helpers for any test framework: example runner with a JSON diff, "every stage has examples", generated files are current, assembly-reference checks. |
 | `Seamlineage.Hosting.InProc` | In-process runner, edge recorder, fixture promoter, and a host command line (`manifest`, `run`, `promote`). |
 | `Seamlineage.Cli` | The `seamlineage` command: `graph` and `check`. |
@@ -131,9 +134,9 @@ even for public packages) and how a release is made.
 |---|---|---|
 | 0 | Prove the approach on a real application (photo import: scan, group, detect exposure brackets), including an AI-authored stage reviewed from diagram and examples first | Done, in a private proving-ground repo |
 | 1 | Draft spec v0: manifest, examples, recordings, diagram rules | In progress ([`spec/`](spec/)) |
-| 2 | Conformance suite, starting with the building blocks (group-by, order-by, session, split-small-groups) | Next |
+| 2 | Conformance suite, starting with the building blocks (group-by, order-by, session, split-small-groups) | Done for the operators: [`spec/operators.md`](spec/operators.md) and [`spec/conformance/`](spec/conformance/) (39 cases, all passed by the C# reference); stages and hosts next |
 | 3 | C# reference implementation and the shared CLI, extracted from the proving ground | In progress: contracts, operators, test helpers, in-process host and the `seamlineage` CLI (`graph`, `check`) are done, dogfooded by [`samples/harvest`](samples/harvest/); the release workflow (GitHub Packages and single-file CLI downloads, [RELEASING.md](RELEASING.md)) is ready, awaiting the first tag |
-| 4 | Pipeline text and example tables in generated docs | Next |
+| 4 | Pipeline text and example tables in generated docs | Done: one page per stage ([example](samples/harvest/graph/group-baskets.md)), see [`spec/diagram.md`](spec/diagram.md) |
 | 5 | Per-PR change diagram: only changed stages and their neighbours, highlighted | Planned |
 | 6 | Go implementation passing the conformance suite | Planned |
 | 7 | Kafka-protocol distributed host | Planned |

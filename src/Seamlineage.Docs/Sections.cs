@@ -25,20 +25,26 @@ public sealed class HeaderSection : IDiagramSection
 /// </summary>
 public sealed class FlowchartSection : IDiagramSection
 {
-    public void Write(DiagramContext context, StringBuilder md)
+    public void Write(DiagramContext context, StringBuilder md) =>
+        Draw(context.Manifest, context.Manifest.EdgeTypes, context.Manifest.Stages, md);
+
+    /// <summary>
+    /// Draws <paramref name="stages"/> between the boxes of <paramref name="edgeTypes"/>. GRAPH.md draws every stage;
+    /// a stage page draws one stage between its input and output, by the same rules.
+    /// </summary>
+    public static void Draw(ManifestView manifest, IEnumerable<string> edgeTypes, IEnumerable<JsonNode> stages, StringBuilder md)
     {
-        var manifest = context.Manifest;
         md.Append("```mermaid\nflowchart LR\n");
         // Mermaid "markdown strings" ("`...`"): **bold**, real line breaks, automatic wrapping, and no HTML or entity
         // escapes, so the raw file reads cleanly in a diff with one field per line.
-        foreach (var type in manifest.EdgeTypes)
+        foreach (var type in edgeTypes)
         {
             var fields = manifest.Types[type] is JsonObject shape
                 ? shape.Select(f => $"\n{f.Key}: {(string)f.Value!}")
                 : [];
             md.Append($"    {type}[\"`**{type}**{string.Concat(fields)}`\"]\n");
         }
-        foreach (var stage in manifest.Stages)
+        foreach (var stage in stages)
         {
             var label = $"**{(string)stage["name"]!}**\n{Plain((string)stage["description"]!)}";
             if (stage["steps"] is JsonArray steps)
@@ -68,13 +74,17 @@ public sealed class FlowchartSection : IDiagramSection
     }
 }
 
-/// <summary>Each stage with what it decides, a link to its code, and a link to its examples with their count.</summary>
+/// <summary>
+/// Each stage, linked to its page, with what it decides, a link to its code, and a link to its examples with their
+/// count.
+/// </summary>
 public sealed class StagesSection : IDiagramSection
 {
     public void Write(DiagramContext context, StringBuilder md)
     {
         md.Append("\n## Stages\n\n");
-        md.Append("Each arrow above, with the code that implements it and the examples that specify it.\n\n");
+        md.Append("Each arrow above, with its page (how it decides, and what it decides on each example), the code that ");
+        md.Append("implements it and the examples that specify it.\n\n");
         md.Append("| Stage | What it decides | Code | Examples |\n|---|---|---|---|\n");
         foreach (var stage in context.Manifest.Stages)
         {
@@ -83,7 +93,7 @@ public sealed class StagesSection : IDiagramSection
             var examples = context.FixtureCases.TryGetValue(name, out var count) && count > 0
                 ? $"[{count} case{(count == 1 ? "" : "s")}]({context.FixturesLink(name)})"
                 : "none";
-            md.Append($"| **{name}** | {Cell((string)stage["description"]!)} | [{Path.GetFileName(code)}]({context.CodeLink(code)}) | {examples} |\n");
+            md.Append($"| [**{name}**]({context.PageLink(name)}) | {Cell((string)stage["description"]!)} | [{Path.GetFileName(code)}]({context.CodeLink(code)}) | {examples} |\n");
         }
     }
 }
@@ -115,8 +125,8 @@ public sealed class OperatorsSection : IDiagramSection
         md.Append("\n## Operators\n\n");
         md.Append("Generic building blocks, product-agnostic and the same in every stage that uses them.\n\n");
         md.Append("| Operator | What it does |\n|---|---|\n");
-        foreach (var (name, description) in operators)
-            md.Append($"| **{name}** | {Cell((string)description!)} |\n");
+        foreach (var (name, _) in operators)
+            md.Append($"| **{name}** | {Cell(context.Manifest.OperatorDescription(name) ?? "")} |\n");
     }
 }
 

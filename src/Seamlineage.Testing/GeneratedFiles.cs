@@ -31,8 +31,9 @@ public static class GeneratedFiles
     }
 
     /// <summary>
-    /// Throws unless GRAPH.md is what <c>seamlineage graph</c> generates from the committed manifest and examples, every
-    /// link in it resolves, and every stage has examples. The same rules as <c>seamlineage check</c>.
+    /// Throws unless GRAPH.md and its stage pages are what <c>seamlineage graph</c> generates from the committed manifest
+    /// and examples, every link in them resolves, every example view fits its examples, and every stage has examples.
+    /// The same rules as <c>seamlineage check</c>.
     /// </summary>
     /// <param name="regenerate">The command that regenerates the page; it is also written in the page's header.</param>
     public static void DiagramIsCurrent(string manifestPath, string fixturesDir, string graphMdPath, string regenerate = "seamlineage graph")
