@@ -1,0 +1,73 @@
+name: release
+
+# Pushing a tag v<semver> (e.g. v0.1.0) builds and tests at that commit, packs every package with the tag's version,
+# pushes the packages to GitHub Packages, and creates a GitHub Release with the single-file CLI and the packages
+# attached. See RELEASING.md.
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # create the GitHub Release
+      packages: write   # push to GitHub Packages with GITHUB_TOKEN
+    env:
+      DOTNET_NOLOGO: true
+      PACKAGES_SOURCE: https://nuget.pkg.github.com/Dan-Price-Photography/index.json
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Version from the tag
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Tag '$GITHUB_REF_NAME' is not v<major>.<minor>.<patch>[-<prerelease>]"
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "Releasing $version"
+
+      - name: Build
+        run: dotnet build Seamlineage.slnx --configuration Release -p:Version="$VERSION"
+
+      - name: Test
+        run: dotnet test Seamlineage.slnx --no-build --configuration Release
+
+      - name: Pack
+        run: dotnet pack Seamlineage.slnx --no-build --configuration Release -p:Version="$VERSION" --output artifacts/packages
+
+      # One self-contained, trimmed file per platform, for teams without .NET.
+      - name: Single-file CLI for win-x64, linux-x64 and osx-arm64
+        run: |
+          mkdir -p artifacts/cli
+          for rid in win-x64 linux-x64 osx-arm64; do
+            dotnet publish src/Seamlineage.Cli --configuration Release --runtime "$rid" -p:Version="$VERSION" --output "artifacts/publish/$rid"
+            ext=""; [ "$rid" = win-x64 ] && ext=".exe"
+            cp "artifacts/publish/$rid/seamlineage$ext" "artifacts/cli/seamlineage-$VERSION-$rid$ext"
+          done
+          ls -l artifacts/cli artifacts/packages
+
+      - name: The Linux CLI checks the sample
+        run: |
+          chmod +x "artifacts/cli/seamlineage-$VERSION-linux-x64"
+          "artifacts/cli/seamlineage-$VERSION-linux-x64" --version
+          "artifacts/cli/seamlineage-$VERSION-linux-x64" check --manifest samples/harvest/graph.manifest.json --fixtures samples/harvest/fixtures --out samples/harvest/GRAPH.md
+
+      # GitHub Packages, authenticated by the workflow's own token: no repository secret is needed. To publish to
+      # nuget.org instead, change --source to https://api.nuget.org/v3/index.json and --api-key to a secret.
+      - name: Push the packages to GitHub Packages
+        run: dotnet nuget push "artifacts/packages/*.nupkg" --source "$PACKAGES_SOURCE" --api-key "${{ secrets.GITHUB_TOKEN }}" --skip-duplicate
+
+      - name: Create the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prerelease=""; [[ "$VERSION" == *-* ]] && prerelease="--prerelease"
+          gh release create "$GITHUB_REF_NAME" $prerelease --verify-tag --generate-notes --title "Seamlineage $VERSION" \
+            artifacts/cli/* artifacts/packages/*.nupkg
