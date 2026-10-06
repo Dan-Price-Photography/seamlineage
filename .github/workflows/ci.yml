@@ -41,6 +41,10 @@ jobs:
       - name: Test
         run: dotnet test Seamlineage.slnx --no-build --configuration Release
 
+      # What the release workflow publishes, built on every change (warnings are errors here too).
+      - name: Packages pack cleanly
+        run: dotnet pack Seamlineage.slnx --no-build --configuration Release --output artifacts/packages
+
       # The CLI as teams without .NET get it: one self-contained, trimmed file.
       - name: Single-file CLI checks the sample
         run: |

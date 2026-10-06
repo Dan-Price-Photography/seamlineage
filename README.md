@@ -112,6 +112,10 @@ The CLI reads only the manifest and the examples folder, so it serves a graph wr
 a .NET tool (`dotnet pack src/Seamlineage.Cli`, then `dotnet tool install`), or build one self-contained file:
 `dotnet publish src/Seamlineage.Cli -c Release -r linux-x64` (or `win-x64`, `osx-arm64`, ...).
 
+Released packages are published to GitHub Packages, and each GitHub Release carries the single-file CLI for
+Windows, Linux and macOS. [RELEASING.md](RELEASING.md) says how to use the packages (GitHub Packages needs a token
+even for public packages) and how a release is made.
+
 | Package | What it holds |
 |---|---|
 | `Seamlineage.Contracts` | Stage, effect, envelope, state-store contract, graph builder, composed-stage steps, wire JSON, manifest emitter. BCL only. |
@@ -128,7 +132,7 @@ a .NET tool (`dotnet pack src/Seamlineage.Cli`, then `dotnet tool install`), or 
 | 0 | Prove the approach on a real application (photo import: scan, group, detect exposure brackets), including an AI-authored stage reviewed from diagram and examples first | Done, in a private proving-ground repo |
 | 1 | Draft spec v0: manifest, examples, recordings, diagram rules | In progress ([`spec/`](spec/)) |
 | 2 | Conformance suite, starting with the building blocks (group-by, order-by, session, split-small-groups) | Next |
-| 3 | C# reference implementation and the shared CLI, extracted from the proving ground | In progress: contracts, operators, test helpers, in-process host and the `seamlineage` CLI (`graph`, `check`) are done, dogfooded by [`samples/harvest`](samples/harvest/); publishing the packages is next |
+| 3 | C# reference implementation and the shared CLI, extracted from the proving ground | In progress: contracts, operators, test helpers, in-process host and the `seamlineage` CLI (`graph`, `check`) are done, dogfooded by [`samples/harvest`](samples/harvest/); the release workflow (GitHub Packages and single-file CLI downloads, [RELEASING.md](RELEASING.md)) is ready, awaiting the first tag |
 | 4 | Pipeline text and example tables in generated docs | Next |
 | 5 | Per-PR change diagram: only changed stages and their neighbours, highlighted | Planned |
 | 6 | Go implementation passing the conformance suite | Planned |

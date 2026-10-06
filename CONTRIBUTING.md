@@ -13,3 +13,4 @@ Thanks for helping. Seamlineage is early, so open an issue before a large change
   shell. The libraries reference nothing outside .NET's base class library (a test enforces it).
 - **Licence.** Contributions are accepted under the [Apache License 2.0](LICENSE) (section 5); no CLA or DCO sign-off
   is needed.
+- **Releases** are made by the owner by pushing a version tag; see [RELEASING.md](RELEASING.md).

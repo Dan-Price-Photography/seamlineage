@@ -7,12 +7,29 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <InvariantGlobalization>true</InvariantGlobalization>
 
-    <!-- Package metadata for the libraries and the CLI tool. Tests and samples set IsPackable=false. -->
-    <Authors>Seamlineage contributors</Authors>
+    <!--
+      Package metadata for the libraries and the CLI tool; each project sets its own Description. Tests and samples
+      set IsPackable=false. The release workflow sets Version from the tag (v0.1.0 → 0.1.0).
+    -->
+    <Version>0.1.0-preview</Version>
+    <Authors>Dan Price Photography</Authors>
+    <Company>Dan Price Photography</Company>
+    <Copyright>Copyright Dan Price Photography and Seamlineage contributors</Copyright>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Dan-Price-Photography/seamlineage</PackageProjectUrl>
+    <!-- GitHub Packages links each package to the repository named here. -->
     <RepositoryUrl>https://github.com/Dan-Price-Photography/seamlineage</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <Version>0.1.0-preview</Version>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>seamlineage;pipeline;dataflow;code-review;lineage;mermaid</PackageTags>
+
+    <!-- Reproducible packages from CI: normalised source paths in symbols, and the commit in the package. -->
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Every package carries the repository README. Ignored by projects that are not packed. -->
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
 </Project>
