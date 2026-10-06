@@ -6,8 +6,8 @@ namespace Seamlineage.Cli;
 /// <summary>
 /// The shared <c>seamlineage</c> command line. It reads only a manifest and an examples folder, never a product's
 /// assemblies, so it serves any implementation language. Each command is one entry in <see cref="Commands"/>; new
-/// views (pipeline text, example tables, a per-PR change diagram) are added as new commands or as new
-/// <see cref="IDiagramSection"/>s of the page.
+/// views (a per-PR change diagram, ...) are added as new commands, new <see cref="IDiagramSection"/>s of GRAPH.md, or new
+/// parts of the stage pages.
 /// </summary>
 public static class CliApp
 {
@@ -15,9 +15,12 @@ public static class CliApp
 
     private static readonly Dictionary<string, Command> Commands = new(StringComparer.Ordinal)
     {
-        ["graph"] = new("Write GRAPH.md from a manifest and its examples.", ["manifest", "fixtures", "out"], Graph),
+        ["graph"] = new(
+            "Write GRAPH.md, and a page per stage in graph/ beside it, from a manifest and its examples.",
+            ["manifest", "fixtures", "out"],
+            Graph),
         ["check"] = new(
-            "Exit 1 if GRAPH.md is stale, a link in it does not resolve, or (with --fixtures) a stage has no examples or an examples folder names no stage.",
+            "Exit 1 if GRAPH.md or a stage page is stale, a link in them does not resolve, a stage's example view does not fit an example, or (with --fixtures) a stage has no examples or an examples folder names no stage.",
             ["manifest", "fixtures", "out"],
             Check),
     };
@@ -61,10 +64,8 @@ public static class CliApp
     private static int Graph(IReadOnlyDictionary<string, string> options, TextWriter stdout, TextWriter stderr)
     {
         var (manifest, fixtures, outPath) = Paths(options);
-        var page = GraphDocs.Render(manifest, fixtures, outPath);
-        if (Path.GetDirectoryName(Path.GetFullPath(outPath)) is { } dir) Directory.CreateDirectory(dir);
-        File.WriteAllText(outPath, page);
-        stdout.WriteLine($"Wrote {outPath}");
+        var pages = GraphDocs.Write(manifest, fixtures, outPath);
+        stdout.WriteLine($"Wrote {outPath} and {pages} stage page{(pages == 1 ? "" : "s")} in {Path.Combine(Path.GetDirectoryName(outPath) ?? "", GraphDocs.PagesFolder)}");
         return 0;
     }
 
@@ -74,7 +75,7 @@ public static class CliApp
         var problems = GraphDocs.Check(manifest, fixtures, outPath);
         foreach (var problem in problems) stderr.WriteLine(problem);
         if (problems.Count > 0) return 1;
-        stdout.WriteLine($"{outPath} is current and every link resolves.");
+        stdout.WriteLine($"{outPath} is current, as are its stage pages, and every link resolves.");
         return 0;
     }
 
@@ -116,7 +117,7 @@ public static class CliApp
             "options:",
             "  --manifest  the manifest to read (default graph.manifest.json)",
             "  --fixtures  the examples folder, fixtures/<stage>/<case>/ (optional; without it no examples are linked)",
-            "  --out       the page to write or check (default GRAPH.md); links in it are relative to it",
+            "  --out       the page to write or check (default GRAPH.md); stage pages go in graph/ beside it, and links are relative to each page",
             "",
         ]);
         return string.Join("\n", lines);

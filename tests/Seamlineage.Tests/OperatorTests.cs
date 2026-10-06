@@ -160,7 +160,7 @@ public class OperatorTests
 
         Assert.Equal(["group-by", "order-by", "session", "split-small-groups"], pipeline.Steps.Select(s => s.Operator));
         Assert.Equal([new("key", "room")], pipeline.Steps[0].Parameters);
-        Assert.Equal([new("by", "at, name")], pipeline.Steps[1].Parameters);
+        Assert.Equal([new("by", "at, then name")], pipeline.Steps[1].Parameters);
         Assert.Equal(
             [new("at", "at"), new("maxGap", "2.5 s"), new KeyValuePair<string, string>("breakWhen", "shrinks")],
             pipeline.Steps[2].Parameters);
@@ -179,6 +179,58 @@ public class OperatorTests
         var step = Pipeline.Of<Event>().GroupBy(Room).Session(At, TimeSpan.FromSeconds(2)).Steps[^1];
 
         Assert.Equal([new("at", "at"), new KeyValuePair<string, string>("maxGap", "2 s")], step.Parameters);
+    }
+
+    [Fact]
+    public void Session_writes_whole_minutes_and_hours_as_such_and_anything_else_in_seconds()
+    {
+        string Gap(TimeSpan gap) => Pipeline.Of<Event>().GroupBy(Room).Session(At, gap).Steps[^1].Parameters[1].Value;
+
+        Assert.Equal("5 min", Gap(TimeSpan.FromMinutes(5)));
+        Assert.Equal("2 h", Gap(TimeSpan.FromHours(2)));
+        Assert.Equal("90 s", Gap(TimeSpan.FromSeconds(90)));
+        Assert.Equal("0.25 s", Gap(TimeSpan.FromMilliseconds(250)));
+        Assert.Equal("0 s", Gap(TimeSpan.Zero));
+    }
+
+    [Fact]
+    public void Session_joins_several_break_judgments_with_or()
+    {
+        var other = Judgment.Of("grows", "The event is bigger than the one before.", (IReadOnlyList<Event> s, Event next) => next.Size > s[^1].Size);
+
+        var step = Pipeline.Of<Event>().GroupBy(Room).Session(At, TimeSpan.FromSeconds(2), Shrinks, other).Steps[^1];
+
+        Assert.Equal("shrinks or grows", step.Parameters.Single(p => p.Key == "breakWhen").Value);
+    }
+
+    [Fact]
+    public void Each_operator_declares_a_phrase_that_names_only_its_own_parameters()
+    {
+        var steps = Pipeline.Of<Event>()
+            .GroupBy(Room)
+            .OrderBy(At, Name)
+            .Session(At, TimeSpan.FromMinutes(5), Shrinks)
+            .SplitSmallGroups(minimum: 3, keptAs: Turnout.Crowd, splitAs: Turnout.Loner)
+            .Steps;
+
+        Assert.Equal(
+            [
+                "group by {key}",
+                "order each group by {by}",
+                "start a new session when: more than {maxGap} since the previous {at}[, or {breakWhen}]",
+                "keep groups of {minimum} or more whole as {keptAs}; split the rest into groups of one, each {splitAs}",
+            ],
+            steps.Select(s => s.OperatorPhrase));
+        foreach (var step in steps)
+        foreach (var name in System.Text.RegularExpressions.Regex.Matches(step.OperatorPhrase!, @"\{(\w+)\}").Select(m => m.Groups[1].Value))
+            Assert.Contains(name, new[] { "key", "by", "at", "maxGap", "breakWhen", "minimum", "keptAs", "splitAs" });
+    }
+
+    [Fact]
+    public void A_pipeline_names_the_items_it_runs_over()
+    {
+        Assert.Equal("items", Pipeline.Of<Event>().GroupBy(Room).Items);
+        Assert.Equal("events", Pipeline.Of<Event>("events").GroupBy(Room).OrderBy(At).Items);
     }
 
     [Fact]

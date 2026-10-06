@@ -1,8 +1,9 @@
 namespace Seamlineage.Contracts;
 
 /// <summary>
-/// One node of a graph, type-erased so hosts can run any graph generically. <see cref="Steps"/> is set when the stage
-/// is composed from generic operators (<see cref="IComposedStage"/>), and null for a plain stage.
+/// One node of a graph, type-erased so hosts can run any graph generically. <see cref="Steps"/> and
+/// <see cref="Items"/> are set when the stage is composed from generic operators (<see cref="IComposedStage"/>), and
+/// null for a plain stage; <see cref="ExampleView"/> when the stage declares one (<see cref="IHasExampleView"/>).
 /// </summary>
 public sealed record StageNode(
     string Name,
@@ -12,7 +13,9 @@ public sealed record StageNode(
     Type OutputType,
     int SchemaVersion,
     Func<object, StageContext, StageResult<object>> Invoke,
-    IReadOnlyList<StepInfo>? Steps = null);
+    IReadOnlyList<StepInfo>? Steps = null,
+    string? Items = null,
+    ExampleView? ExampleView = null);
 
 /// <summary>A linear pipeline: the product's description of what happens, independent of where it runs.</summary>
 public sealed record Graph(string Name, Type InputType, IReadOnlyList<StageNode> Stages)
@@ -38,11 +41,12 @@ public sealed class GraphBuilder<TCurrent>
     public GraphBuilder<TNext> Then<TNext>(string name, string description, IStage<TCurrent, TNext> stage, int schemaVersion = 1)
         where TNext : notnull
     {
+        var composed = stage as IComposedStage;
         var node = new StageNode(name, description, stage.GetType(), typeof(TCurrent), typeof(TNext), schemaVersion, (input, ctx) =>
         {
             var result = stage.Run((TCurrent)input, ctx);
             return new StageResult<object>(result.Output, result.Effects);
-        }, (stage as IComposedStage)?.Steps);
+        }, composed?.Steps, composed?.Items, (stage as IHasExampleView)?.ExampleView);
         return new GraphBuilder<TNext>(_name, _inputType, [.. _stages, node]);
     }
 

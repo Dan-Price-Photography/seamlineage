@@ -13,6 +13,8 @@ public static class SplitSmallGroupsOperator
         "Keeps each group of at least minimum items whole, labelled keptAs; splits each smaller group into groups of "
         + "one item, each labelled splitAs. Groups stay in order, and the items of a split group stay in its place.";
 
+    public const string Phrase = "keep groups of {minimum} or more whole as {keptAs}; split the rest into groups of one, each {splitAs}";
+
     public static Pipeline<TIn, IReadOnlyList<Labelled<TLabel, T>>> SplitSmallGroups<TIn, T, TLabel>(
         this Pipeline<TIn, IReadOnlyList<IReadOnlyList<T>>> pipeline, int minimum, TLabel keptAs, TLabel splitAs) =>
         pipeline.Then<IReadOnlyList<Labelled<TLabel, T>>>(
@@ -20,7 +22,8 @@ public static class SplitSmallGroupsOperator
                 "split-small-groups",
                 Description,
                 [new("minimum", minimum.ToString(CultureInfo.InvariantCulture)), new("keptAs", Show(keptAs)), new("splitAs", Show(splitAs))],
-                []),
+                [],
+                Phrase),
             groups =>
             [
                 .. groups.SelectMany(g => g.Count >= minimum

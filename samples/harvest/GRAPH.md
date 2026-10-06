@@ -25,10 +25,10 @@ Decides which logged picks count, and records a reason for every pick rejected: 
         group_baskets_1["`**group-by**
 key: row`"]
         group_baskets_2["`**order-by**
-by: picked-at, id`"]
+by: picked-at, then id`"]
         group_baskets_3["`**session**
 at: picked-at
-maxGap: 300 s
+maxGap: 5 min
 breakWhen: variety-changes`"]
         group_baskets_4["`**split-small-groups**
 minimum: 3
@@ -47,13 +47,13 @@ Totals the weight of each basket and of the whole harvest, loose picks included.
 
 ## Stages
 
-Each arrow above, with the code that implements it and the examples that specify it.
+Each arrow above, with its page (how it decides, and what it decides on each example), the code that implements it and the examples that specify it.
 
 | Stage | What it decides | Code | Examples |
 |---|---|---|---|
-| **check-picks** | Decides which logged picks count, and records a reason for every pick rejected: no weight, or a variety the orchard does not grow. | [CheckPicks.cs](src/Harvest/CheckPicks.cs) | [4 cases](fixtures/check-picks/) |
-| **group-baskets** | Groups 3 or more picks from one row, each within 5 minutes of the last and of the same variety, into a basket; every other pick is loose, a group of one. | [GroupBaskets.cs](src/Harvest/GroupBaskets.cs) | [5 cases](fixtures/group-baskets/) |
-| **weigh-baskets** | Totals the weight of each basket and of the whole harvest, loose picks included. | [WeighBaskets.cs](src/Harvest/WeighBaskets.cs) | [2 cases](fixtures/weigh-baskets/) |
+| [**check-picks**](graph/check-picks.md) | Decides which logged picks count, and records a reason for every pick rejected: no weight, or a variety the orchard does not grow. | [CheckPicks.cs](src/Harvest/CheckPicks.cs) | [4 cases](fixtures/check-picks/) |
+| [**group-baskets**](graph/group-baskets.md) | Groups 3 or more picks from one row, each within 5 minutes of the last and of the same variety, into a basket; every other pick is loose, a group of one. | [GroupBaskets.cs](src/Harvest/GroupBaskets.cs) | [5 cases](fixtures/group-baskets/) |
+| [**weigh-baskets**](graph/weigh-baskets.md) | Totals the weight of each basket and of the whole harvest, loose picks included. | [WeighBaskets.cs](src/Harvest/WeighBaskets.cs) | [2 cases](fixtures/weigh-baskets/) |
 
 ## Judgments
 

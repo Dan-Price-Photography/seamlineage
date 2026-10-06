@@ -17,6 +17,7 @@
       "output": "Baskets",
       "schemaVersion": 1,
       "code": "src/Harvest/GroupBaskets.cs",
+      "items": "accepted picks",
       "steps": [
         {
           "operator": "group-by",
@@ -27,14 +28,14 @@
         {
           "operator": "order-by",
           "parameters": {
-            "by": "picked-at, id"
+            "by": "picked-at, then id"
           }
         },
         {
           "operator": "session",
           "parameters": {
             "at": "picked-at",
-            "maxGap": "300 s",
+            "maxGap": "5 min",
             "breakWhen": "variety-changes"
           }
         },
@@ -52,6 +53,42 @@
         "picked-at": "When the fruit was picked by the picker's watch; none if it was not noted.",
         "id": "The pick's id, which keeps log order among picks noted at the same minute.",
         "variety-changes": "The pick is a different variety from the one before it, so a basket holds one variety."
+      },
+      "exampleView": {
+        "rows": "accepted",
+        "columns": [
+          {
+            "label": "pick",
+            "path": "id"
+          },
+          {
+            "label": "tree",
+            "path": "tree"
+          },
+          {
+            "label": "variety",
+            "path": "variety"
+          },
+          {
+            "label": "picked at",
+            "path": "pickedAt"
+          }
+        ],
+        "outcome": {
+          "from": "groups",
+          "members": "picks",
+          "match": "id",
+          "columns": [
+            {
+              "label": "basket",
+              "path": "key"
+            },
+            {
+              "label": "kind",
+              "path": "kind"
+            }
+          ]
+        }
       }
     },
     {
@@ -64,10 +101,22 @@
     }
   ],
   "operators": {
-    "group-by": "Splits the items into groups that share a key, in the order each key first appears.",
-    "order-by": "Sorts the items within each group by the keys in turn, keeping the original order for ties; an item with no value for a key sorts after those with one, and text compares ordinally.",
-    "session": "Splits each ordered group into sessions: an item joins the current session when its time is at most maxGap after the time of the previous item and no breakWhen judgment holds; otherwise it starts a new one. An item with no time is a session of its own.",
-    "split-small-groups": "Keeps each group of at least minimum items whole, labelled keptAs; splits each smaller group into groups of one item, each labelled splitAs. Groups stay in order, and the items of a split group stay in its place."
+    "group-by": {
+      "description": "Splits the items into groups that share a key, in the order each key first appears.",
+      "phrase": "group by {key}"
+    },
+    "order-by": {
+      "description": "Sorts the items within each group by the keys in turn, keeping the original order for ties; an item with no value for a key sorts after those with one, and text compares ordinally.",
+      "phrase": "order each group by {by}"
+    },
+    "session": {
+      "description": "Splits each ordered group into sessions: an item joins the current session when its time is at most maxGap after the time of the previous item and no breakWhen judgment holds; otherwise it starts a new one. An item with no time is a session of its own.",
+      "phrase": "start a new session when: more than {maxGap} since the previous {at}[, or {breakWhen}]"
+    },
+    "split-small-groups": {
+      "description": "Keeps each group of at least minimum items whole, labelled keptAs; splits each smaller group into groups of one item, each labelled splitAs. Groups stay in order, and the items of a split group stay in its place.",
+      "phrase": "keep groups of {minimum} or more whole as {keptAs}; split the rest into groups of one, each {splitAs}"
+    }
   },
   "types": {
     "Basket": {
