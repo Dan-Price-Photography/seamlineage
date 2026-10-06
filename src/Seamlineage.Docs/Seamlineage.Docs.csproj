@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Seamlineage docs: renders a graph.manifest.json (from any implementation language) as GRAPH.md with a Mermaid diagram, and checks a committed copy is current. Base class library only.</Description>
+    <Description>Seamlineage docs: renders a graph.manifest.json (from any implementation language) as GRAPH.md (a Mermaid diagram) and a page per stage (pipeline text and example tables), and checks committed copies are current. Base class library only.</Description>
   </PropertyGroup>
 
 </Project>

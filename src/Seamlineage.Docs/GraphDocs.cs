@@ -3,8 +3,8 @@ using System.Text.RegularExpressions;
 namespace Seamlineage.Docs;
 
 /// <summary>
-/// GRAPH.md as files on disk: render it from a manifest and an examples folder, and check a committed copy. Shared by
-/// the CLI and the test helpers, so both apply exactly the same rules.
+/// GRAPH.md and its stage pages as files on disk: render them from a manifest and an examples folder, and check
+/// committed copies. Shared by the CLI and the test helpers, so both apply exactly the same rules.
 /// </summary>
 public static partial class GraphDocs
 {
@@ -34,7 +34,71 @@ public static partial class GraphDocs
         return GraphDiagram.FromManifest(json, cases, options);
     }
 
-    /// <summary>Everything wrong with a committed GRAPH.md and examples folder; empty when all is well.</summary>
+    /// <summary>The folder of the stage pages, beside GRAPH.md.</summary>
+    public const string PagesFolder = "graph";
+
+    /// <summary>Where the stage pages of the GRAPH.md at <paramref name="outPath"/> go: <c>graph/</c> beside it.</summary>
+    public static string PagesDir(string outPath) => Path.Combine(Path.GetDirectoryName(Path.GetFullPath(outPath))!, PagesFolder);
+
+    /// <summary>
+    /// GRAPH.md and one page per stage (<c>graph/&lt;stage&gt;.md</c>, in stage order), each with links relative to
+    /// itself: full path → content.
+    /// </summary>
+    /// <param name="problems">Collects each example case a stage's example view does not fit.</param>
+    public static IReadOnlyDictionary<string, string> RenderAll(
+        string manifestPath, string? fixturesDir, string outPath, string generatedBy = "seamlineage graph", ICollection<string>? problems = null)
+    {
+        var json = File.ReadAllText(manifestPath);
+        var manifest = ManifestView.Parse(json);
+        var pagesDir = PagesDir(outPath);
+        var manifestDir = Path.GetDirectoryName(Path.GetFullPath(manifestPath))!;
+        var options = new DiagramOptions
+        {
+            ManifestFileName = Path.GetFileName(manifestPath),
+            GeneratedBy = generatedBy,
+            CodeRoot = Relative(pagesDir, manifestDir),
+            FixturesLink = Relative(pagesDir, fixturesDir is null ? Path.Combine(manifestDir, "fixtures") : Path.GetFullPath(fixturesDir)),
+            GraphLink = Relative(pagesDir, Path.GetFullPath(outPath)),
+        };
+
+        var files = new OrderedDictionary<string, string>(StringComparer.Ordinal)
+        {
+            [Path.GetFullPath(outPath)] = Render(manifestPath, fixturesDir, outPath, generatedBy),
+        };
+        foreach (var stage in manifest.Stages.Select(s => (string)s["name"]!))
+            files[Path.Combine(pagesDir, stage + ".md")] = StagePage.FromManifest(json, stage, ReadCases(fixturesDir, stage), options, problems);
+        return files;
+    }
+
+    /// <summary>Writes GRAPH.md and the stage pages, and deletes pages in <c>graph/</c> of stages that no longer exist.</summary>
+    /// <returns>The number of stage pages written.</returns>
+    public static int Write(string manifestPath, string? fixturesDir, string outPath, string generatedBy = "seamlineage graph")
+    {
+        var files = RenderAll(manifestPath, fixturesDir, outPath, generatedBy);
+        foreach (var stray in StrayPages(outPath, files.Keys)) File.Delete(stray);
+        foreach (var (path, content) in files)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllText(path, content);
+        }
+        return files.Count - 1;
+    }
+
+    /// <summary>The example cases of a stage, in case order (ordinal), with the text of their files.</summary>
+    public static IReadOnlyList<ExampleCase> ReadCases(string? fixturesDir, string stage)
+    {
+        var stageDir = fixturesDir is null ? null : Path.Combine(fixturesDir, stage);
+        if (stageDir is null || !Directory.Exists(stageDir)) return [];
+        return
+        [
+            .. Directory.GetDirectories(stageDir).Order(StringComparer.Ordinal).Select(dir => new ExampleCase(
+                Path.GetFileName(dir),
+                ReadIfExists(Path.Combine(dir, "input.json")),
+                ReadIfExists(Path.Combine(dir, "expected.json")))),
+        ];
+    }
+
+    /// <summary>Everything wrong with a committed GRAPH.md, its stage pages and the examples folder; empty when all is well.</summary>
     public static IReadOnlyList<string> Check(string manifestPath, string? fixturesDir, string outPath, string generatedBy = "seamlineage graph")
     {
         var problems = new List<string>();
@@ -44,11 +108,25 @@ public static partial class GraphDocs
             return problems;
         }
 
-        var expected = Render(manifestPath, fixturesDir, outPath, generatedBy);
-        if (File.ReadAllText(outPath).ReplaceLineEndings() != expected.ReplaceLineEndings())
-            problems.Add($"{outPath} is stale. Regenerate it with: {generatedBy}");
-
-        problems.AddRange(BrokenLinks(outPath).Select(link => $"{outPath} links to {link}, which does not exist."));
+        var viewProblems = new List<string>();
+        var files = RenderAll(manifestPath, fixturesDir, outPath, generatedBy, viewProblems);
+        var outDir = Path.GetDirectoryName(outPath) ?? "";
+        foreach (var (path, expected) in files)
+        {
+            // Name each page as the caller named GRAPH.md: relative paths stay relative.
+            var shown = path == Path.GetFullPath(outPath) ? outPath : Path.Combine(outDir, PagesFolder, Path.GetFileName(path));
+            if (!File.Exists(path))
+            {
+                problems.Add($"{shown} does not exist. Generate it with: {generatedBy}");
+                continue;
+            }
+            if (File.ReadAllText(path).ReplaceLineEndings() != expected.ReplaceLineEndings())
+                problems.Add($"{shown} is stale. Regenerate it with: {generatedBy}");
+            problems.AddRange(BrokenLinks(path).Select(link => $"{shown} links to {link}, which does not exist."));
+        }
+        problems.AddRange(StrayPages(outPath, files.Keys).Select(stray =>
+            $"{Path.Combine(outDir, PagesFolder, Path.GetFileName(stray))} is not the page of any stage. Delete it, or regenerate with: {generatedBy}"));
+        problems.AddRange(viewProblems);
 
         if (fixturesDir is not null)
         {
@@ -89,6 +167,17 @@ public static partial class GraphDocs
                 .Order(StringComparer.Ordinal)!,
         ];
     }
+
+    // Markdown files in graph/ that are not a current stage page, e.g. after a stage was renamed. Other files are left alone.
+    private static IEnumerable<string> StrayPages(string outPath, IEnumerable<string> pages)
+    {
+        var dir = PagesDir(outPath);
+        if (!Directory.Exists(dir)) return [];
+        var current = pages.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        return Directory.GetFiles(dir, "*.md").Where(f => !current.Contains(Path.GetFullPath(f))).Order(StringComparer.Ordinal).ToList();
+    }
+
+    private static string? ReadIfExists(string path) => File.Exists(path) ? File.ReadAllText(path) : null;
 
     private static string Relative(string from, string to)
     {

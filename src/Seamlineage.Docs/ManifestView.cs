@@ -31,8 +31,24 @@ public sealed class ManifestView
     /// <summary>Every type reachable from an edge: name → record shape (object) or enum values (array).</summary>
     public JsonObject Types { get; }
 
-    /// <summary>Generic operators used by composed stages: name → description; null when the graph uses none.</summary>
+    /// <summary>Generic operators used by composed stages: name → { description, phrase }; null when the graph uses none.</summary>
     public JsonObject? Operators => Root["operators"] as JsonObject;
+
+    /// <summary>What an operator does. An entry may also be the description alone, as a string (manifests before phrases).</summary>
+    public string? OperatorDescription(string name) => Operators?[name] switch
+    {
+        JsonObject entry => (string?)entry["description"],
+        JsonValue description => (string?)description,
+        _ => null,
+    };
+
+    /// <summary>The template one of an operator's steps reads as in pipeline text; null when it declares none.</summary>
+    public string? OperatorPhrase(string name) => (Operators?[name] as JsonObject)?["phrase"] is JsonValue phrase ? (string?)phrase : null;
+
+    /// <summary>The stage with this name.</summary>
+    public JsonNode Stage(string name) =>
+        Stages.SingleOrDefault(s => (string)s["name"]! == name)
+        ?? throw new InvalidDataException($"The manifest has no stage named '{name}'.");
 
     /// <summary>The types on edges, in graph order: the graph's input, then each new stage output.</summary>
     public IReadOnlyList<string> EdgeTypes { get; }

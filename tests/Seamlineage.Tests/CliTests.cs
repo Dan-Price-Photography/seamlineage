@@ -42,7 +42,37 @@ public class CliTests
         Assert.Equal(0, exit);
         var page = File.ReadAllText(Path.Combine(repo.Path, "GRAPH.md"));
         Assert.StartsWith("# garden graph\n", page);
-        Assert.Contains("| **sow** | Decides how big each row is: 10 or more seeds is large. | [Sow.cs](src/Seamlineage.Tests/Sow.cs) | [1 case](fixtures/sow/) |", page);
+        Assert.Contains("| [**sow**](graph/sow.md) | Decides how big each row is: 10 or more seeds is large. | [Sow.cs](src/Seamlineage.Tests/Sow.cs) | [1 case](fixtures/sow/) |", page);
+    }
+
+    [Fact]
+    public void Graph_writes_a_page_per_stage_and_removes_pages_of_stages_that_are_gone()
+    {
+        using var repo = Repo();
+        repo.Write("graph/sprout.md", "# sprout\n");
+        repo.Write("graph/notes.txt", "kept");
+
+        var (exit, stdout, _) = Run(Args(repo, "graph"));
+
+        Assert.Equal(0, exit);
+        Assert.StartsWith("# sow\n", File.ReadAllText(Path.Combine(repo.Path, "graph", "sow.md")));
+        Assert.StartsWith("# count\n", File.ReadAllText(Path.Combine(repo.Path, "graph", "count.md")));
+        Assert.False(File.Exists(Path.Combine(repo.Path, "graph", "sprout.md")));
+        Assert.True(File.Exists(Path.Combine(repo.Path, "graph", "notes.txt")));
+        Assert.Contains("and 2 stage pages", stdout);
+    }
+
+    [Fact]
+    public void Check_exits_1_when_a_stage_page_is_stale()
+    {
+        using var repo = Repo();
+        Run(Args(repo, "graph"));
+        File.AppendAllText(Path.Combine(repo.Path, "graph", "sow.md"), "edited\n");
+
+        var (exit, _, stderr) = Run(Args(repo, "check"));
+
+        Assert.Equal(1, exit);
+        Assert.Contains("sow.md is stale", stderr);
     }
 
     [Fact]

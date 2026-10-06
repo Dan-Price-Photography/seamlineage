@@ -16,6 +16,15 @@ public sealed record DiagramOptions
 
     /// <summary>The directory stage <c>code</c> paths are relative to (the manifest's), relative to the page. Empty: the same directory.</summary>
     public string CodeRoot { get; init; } = "";
+
+    /// <summary>The folder of the stage pages (graph/), relative to GRAPH.md.</summary>
+    public string PagesLink { get; init; } = "graph";
+
+    /// <summary>GRAPH.md, relative to a stage page.</summary>
+    public string GraphLink { get; init; } = "../GRAPH.md";
+
+    /// <summary>The options of a stage page in graph/ beside GRAPH.md, the manifest and fixtures/.</summary>
+    public static DiagramOptions ForStagePage { get; } = new() { CodeRoot = "..", FixturesLink = "../fixtures" };
 }
 
 /// <summary>Everything a section of the page may draw on.</summary>
@@ -24,6 +33,10 @@ public sealed record DiagramContext(ManifestView Manifest, IReadOnlyDictionary<s
     public string CodeLink(string code) => CodeRoot(Options.CodeRoot) + code;
 
     public string FixturesLink(string stage) => Prefix(Options.FixturesLink) + stage + "/";
+
+    public string CaseLink(string stage, string @case) => FixturesLink(stage) + @case + "/";
+
+    public string PageLink(string stage) => Prefix(Options.PagesLink) + stage + ".md";
 
     private static string CodeRoot(string root) => Prefix(root);
 

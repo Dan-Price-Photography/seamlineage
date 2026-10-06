@@ -9,10 +9,10 @@ version recorded in each file.
 
 | Document | Covers | Status | C# reference |
 |---|---|---|---|
-| [manifest.md](manifest.md) | `graph.manifest.json`: stages, edge types, composed steps, judgments, operators | Draft | Emitted by `Seamlineage.Contracts` (`GraphManifest`) |
-| [examples.md](examples.md) | `fixtures/<stage>/<case>/input.json` and `expected.json` | Draft | Run by `Seamlineage.Testing` (`Fixtures`) |
+| [manifest.md](manifest.md) | `graph.manifest.json`: stages, edge types, composed steps, judgments, operators and their phrase templates, example views | Draft | Emitted by `Seamlineage.Contracts` (`GraphManifest`) |
+| [examples.md](examples.md) | `fixtures/<stage>/<case>/input.json` and `expected.json`; the wire format; example views | Draft | Run by `Seamlineage.Testing` (`Fixtures`) |
 | [recordings.md](recordings.md) | Edge recordings: one envelope per line, per edge | Draft | Written by `Seamlineage.Hosting.InProc` (`EdgeRecorder`), promoted by `FixturePromoter` |
-| diagram.md | How `GRAPH.md` is generated from a manifest | Planned (the rules are implemented by `seamlineage graph`, in `Seamlineage.Docs`) | `seamlineage graph`, `seamlineage check` |
+| [diagram.md](diagram.md) | `GRAPH.md` and the stage pages `graph/<stage>.md`: Mermaid rules, pipeline text, example tables, checks | Draft | `seamlineage graph`, `seamlineage check` (`Seamlineage.Docs`) |
 | operators.md + conformance/ | The building blocks, each defined by examples every implementation must pass | Planned | `Seamlineage.Operators` (unit tests only so far) |
 
 ## Principles the formats serve

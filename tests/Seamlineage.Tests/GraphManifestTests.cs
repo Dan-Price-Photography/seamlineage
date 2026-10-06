@@ -80,10 +80,12 @@ public class GraphManifestTests
     {
         public IReadOnlyList<StepInfo> Steps { get; } =
         [
-            new("group-by", "Splits items into groups by key.", [new("key", "shade")], [new("shade", "How dark the leaf is.")]),
-            new("partition-by-size", "Keeps big groups.", [new("minimum", "3")], []),
+            new("group-by", "Splits items into groups by key.", [new("key", "shade")], [new("shade", "How dark the leaf is.")], "group by {key}"),
+            new("partition-by-size", "Keeps big groups.", [new("minimum", "3")], [], "keep groups of {minimum} or more"),
             new("order-by", "Sorts each group.", [new("by", "shade, name")], [new("shade", "How dark the leaf is."), new("name", "The name of the leaf.")]),
         ];
+
+        public string Items => "leaves";
 
         public StageResult<Tree> Run(Tree input, StageContext context) => throw new NotSupportedException();
     }
@@ -116,8 +118,73 @@ public class GraphManifestTests
         var operators = DescribeComposed()["operators"]!;
 
         Assert.Equal(
-            """{"group-by":"Splits items into groups by key.","order-by":"Sorts each group.","partition-by-size":"Keeps big groups."}""",
+            """{"group-by":{"description":"Splits items into groups by key.","phrase":"group by {key}"},"order-by":{"description":"Sorts each group."},"partition-by-size":{"description":"Keeps big groups.","phrase":"keep groups of {minimum} or more"}}""",
             operators.ToJsonString());
+    }
+
+    [Fact]
+    public void Names_what_a_composed_stage_runs_over_before_its_steps()
+    {
+        var stage = DescribeComposed()["stages"]![1]!.AsObject();
+
+        Assert.Equal("leaves", (string?)stage["items"]);
+        Assert.Equal(["name", "description", "input", "output", "schemaVersion", "code", "items", "steps", "judgments"], stage.Select(p => p.Key));
+    }
+
+    [Fact]
+    public void A_composed_stage_that_names_no_items_runs_over_items()
+    {
+        var graph = Graph.Start<Leaf>("test").Then("grow", "Leaf → tree.", new Grow()).Then("trim", "Tree → tree.", new Trim()).Build();
+
+        Assert.Equal("items", (string?)JsonNode.Parse(GraphManifest.Generate(graph))!["stages"]![1]!["items"]);
+    }
+
+    [Fact]
+    public void Writes_a_declared_example_view_after_the_stages_logic()
+    {
+        var graph = Graph.Start<Leaf>("test").Then("grow", "Leaf → tree.", new Grow()).Then("prune", "Tree → smaller tree.", new ViewedPrune()).Build();
+        var stage = JsonNode.Parse(GraphManifest.Generate(graph))!["stages"]![1]!.AsObject();
+
+        Assert.Equal("exampleView", stage.Last().Key);
+        Assert.Equal(
+            """{"rows":"leaves","columns":[{"label":"leaf","path":"name"},{"label":"shade","path":"shade"}],"outcome":{"from":"leaves","members":"","match":"name","columns":[{"label":"size","path":"size"}]}}""",
+            stage["exampleView"]!.ToJsonString());
+    }
+
+    [Fact]
+    public void An_example_view_without_an_outcome_or_members_omits_them()
+    {
+        var graph = Graph.Start<Leaf>("test").Then("plain", "Leaf → tree.", new ViewedGrow()).Build();
+
+        Assert.Equal(
+            """{"rows":"","columns":[{"label":"leaf","path":"name"}]}""",
+            JsonNode.Parse(GraphManifest.Generate(graph))!["stages"]![0]!["exampleView"]!.ToJsonString());
+    }
+
+    private sealed class Trim : IStage<Tree, Tree>, IComposedStage
+    {
+        public IReadOnlyList<StepInfo> Steps { get; } = [new("group-by", "Splits items into groups by key.", [new("key", "shade")], [])];
+
+        public StageResult<Tree> Run(Tree input, StageContext context) => throw new NotSupportedException();
+    }
+
+    private sealed class ViewedPrune : IStage<Tree, Tree>, IComposedStage, IHasExampleView
+    {
+        public IReadOnlyList<StepInfo> Steps => new Prune().Steps;
+
+        public ExampleView ExampleView { get; } = new(
+            "leaves",
+            [new("leaf", "name"), new("shade", "shade")],
+            new ExampleOutcome("leaves", "name", [new("size", "size")], Members: ""));
+
+        public StageResult<Tree> Run(Tree input, StageContext context) => throw new NotSupportedException();
+    }
+
+    private sealed class ViewedGrow : IStage<Leaf, Tree>, IHasExampleView
+    {
+        public ExampleView ExampleView { get; } = new("", [new("leaf", "name")]);
+
+        public StageResult<Tree> Run(Leaf input, StageContext context) => throw new NotSupportedException();
     }
 
     [Fact]

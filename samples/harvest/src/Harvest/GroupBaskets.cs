@@ -8,7 +8,7 @@ namespace Harvest;
 /// sessions of 3 or more as baskets and split the rest into loose picks. The steps and the judgments below are listed
 /// in graph.manifest.json and drawn in GRAPH.md; this class only names the judgments and shapes the output.
 /// </summary>
-public sealed class GroupBaskets : IStage<CheckedPicks, Baskets>, IComposedStage
+public sealed class GroupBaskets : IStage<CheckedPicks, Baskets>, IComposedStage, IHasExampleView
 {
     // Judgments first: the pipeline below reads them when it is built.
 
@@ -29,13 +29,21 @@ public sealed class GroupBaskets : IStage<CheckedPicks, Baskets>, IComposedStage
         (IReadOnlyList<Pick> basket, Pick next) => next.Variety != basket[^1].Variety);
 
     private static readonly Pipeline<IReadOnlyList<Pick>, IReadOnlyList<Labelled<BasketKind, Pick>>> Grouping =
-        Pipeline.Of<Pick>()
+        Pipeline.Of<Pick>("accepted picks")
             .GroupBy(Row)
             .OrderBy(PickedAt, Id)
             .Session(PickedAt, maxGap: TimeSpan.FromMinutes(5), VarietyChanges)
             .SplitSmallGroups(minimum: 3, keptAs: BasketKind.Basket, splitAs: BasketKind.Loose);
 
     public IReadOnlyList<StepInfo> Steps => Grouping.Steps;
+
+    public string Items => Grouping.Items;
+
+    /// <summary>Each example as a table: one row per accepted pick, then the basket it ended up in and that basket's kind.</summary>
+    public ExampleView ExampleView { get; } = new(
+        Rows: "accepted",
+        Columns: [new("pick", "id"), new("tree", "tree"), new("variety", "variety"), new("picked at", "pickedAt")],
+        Outcome: new(From: "groups", Match: "id", Columns: [new("basket", "key"), new("kind", "kind")], Members: "picks"));
 
     public StageResult<Baskets> Run(CheckedPicks input, StageContext context) =>
         StageResult<Baskets>.Pure(new Baskets(
