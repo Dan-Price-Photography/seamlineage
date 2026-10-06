@@ -1,0 +1,20 @@
+{
+  "groups": [
+    {
+      "key": "p1",
+      "kind": "basket",
+      "picks": [
+        { "id": "p1", "tree": "row-1/tree-1", "variety": "cox", "weightGrams": 150, "pickedAt": "2026-09-12T09:00:00" },
+        { "id": "p2", "tree": "row-1/tree-1", "variety": "cox", "weightGrams": 160, "pickedAt": "2026-09-12T09:05:00" },
+        { "id": "p3", "tree": "row-1/tree-2", "variety": "cox", "weightGrams": 140, "pickedAt": "2026-09-12T09:10:00" }
+      ]
+    },
+    {
+      "key": "p4",
+      "kind": "loose",
+      "picks": [
+        { "id": "p4", "tree": "row-1/tree-3", "variety": "cox", "weightGrams": 155, "pickedAt": "2026-09-12T09:16:00" }
+      ]
+    }
+  ]
+}

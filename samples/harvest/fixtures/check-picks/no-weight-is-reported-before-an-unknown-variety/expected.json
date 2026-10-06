@@ -1,0 +1,6 @@
+{
+  "accepted": [],
+  "rejected": [
+    { "id": "p1", "reason": "noWeight" }
+  ]
+}

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Seamlineage.Contracts\Seamlineage.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Seamlineage.Operators\Seamlineage.Operators.csproj" />
+  </ItemGroup>
+
+</Project>

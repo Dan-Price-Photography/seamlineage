@@ -3,16 +3,17 @@
 The language-neutral formats that every Seamlineage implementation reads and writes. An implementation in any
 language is conformant if it produces these formats and passes the conformance suite.
 
-**Status: draft.** v0 documents what the proving-ground implementation (C#) does today. Fields may be renamed or
-restructured before v1. Breaking changes will bump the `spec` version recorded in each file.
+**Status: draft.** v0 documents what the C# reference implementation ([`src/`](../src/), extracted from the
+proving ground) does today. Fields may be renamed or restructured before v1. Breaking changes will bump the `spec`
+version recorded in each file.
 
-| Document | Covers | Status |
-|---|---|---|
-| [manifest.md](manifest.md) | `graph.manifest.json`: stages, edge types, composed steps, judgments, operators | Draft |
-| [examples.md](examples.md) | `fixtures/<stage>/<case>/input.json` and `expected.json` | Draft |
-| [recordings.md](recordings.md) | Edge recordings: one envelope per line, per edge | Draft |
-| diagram.md | How `GRAPH.md` is generated from a manifest | Planned |
-| operators.md + conformance/ | The building blocks, each defined by examples every implementation must pass | Planned |
+| Document | Covers | Status | C# reference |
+|---|---|---|---|
+| [manifest.md](manifest.md) | `graph.manifest.json`: stages, edge types, composed steps, judgments, operators | Draft | Emitted by `Seamlineage.Contracts` (`GraphManifest`) |
+| [examples.md](examples.md) | `fixtures/<stage>/<case>/input.json` and `expected.json` | Draft | Run by `Seamlineage.Testing` (`Fixtures`) |
+| [recordings.md](recordings.md) | Edge recordings: one envelope per line, per edge | Draft | Written by `Seamlineage.Hosting.InProc` (`EdgeRecorder`), promoted by `FixturePromoter` |
+| diagram.md | How `GRAPH.md` is generated from a manifest | Planned (the rules are implemented by `seamlineage graph`, in `Seamlineage.Docs`) | `seamlineage graph`, `seamlineage check` |
+| operators.md + conformance/ | The building blocks, each defined by examples every implementation must pass | Planned | `Seamlineage.Operators` (unit tests only so far) |
 
 ## Principles the formats serve
 

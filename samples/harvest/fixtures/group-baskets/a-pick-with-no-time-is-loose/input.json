@@ -1,0 +1,9 @@
+{
+  "accepted": [
+    { "id": "p1", "tree": "row-4/tree-1", "variety": "gala", "weightGrams": 180, "pickedAt": "2026-09-12T15:00:00" },
+    { "id": "p2", "tree": "row-4/tree-1", "variety": "gala", "weightGrams": 165, "pickedAt": null },
+    { "id": "p3", "tree": "row-4/tree-2", "variety": "gala", "weightGrams": 172, "pickedAt": "2026-09-12T15:01:00" },
+    { "id": "p4", "tree": "row-4/tree-2", "variety": "gala", "weightGrams": 168, "pickedAt": "2026-09-12T15:02:00" }
+  ],
+  "rejected": []
+}

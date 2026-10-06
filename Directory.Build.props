@@ -1,0 +1,18 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <InvariantGlobalization>true</InvariantGlobalization>
+
+    <!-- Package metadata for the libraries and the CLI tool. Tests and samples set IsPackable=false. -->
+    <Authors>Seamlineage contributors</Authors>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Dan-Price-Photography/seamlineage</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Dan-Price-Photography/seamlineage</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Version>0.1.0-preview</Version>
+  </PropertyGroup>
+</Project>

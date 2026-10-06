@@ -1,0 +1,27 @@
+{
+  "groups": [
+    {
+      "key": "p1",
+      "kind": "basket",
+      "picks": [
+        { "id": "p1", "tree": "row-3/tree-1", "variety": "gala", "weightGrams": 180, "pickedAt": "2026-09-12T11:00:00" },
+        { "id": "p2", "tree": "row-3/tree-1", "variety": "gala", "weightGrams": 175, "pickedAt": "2026-09-12T11:01:00" },
+        { "id": "p3", "tree": "row-3/tree-2", "variety": "gala", "weightGrams": 190, "pickedAt": "2026-09-12T11:02:00" }
+      ]
+    },
+    {
+      "key": "p4",
+      "kind": "loose",
+      "picks": [
+        { "id": "p4", "tree": "row-3/tree-3", "variety": "bramley", "weightGrams": 260, "pickedAt": "2026-09-12T11:03:00" }
+      ]
+    },
+    {
+      "key": "p5",
+      "kind": "loose",
+      "picks": [
+        { "id": "p5", "tree": "row-3/tree-3", "variety": "bramley", "weightGrams": 240, "pickedAt": "2026-09-12T11:04:00" }
+      ]
+    }
+  ]
+}

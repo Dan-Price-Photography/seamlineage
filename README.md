@@ -86,6 +86,41 @@ Code is the last resort, not the default. Examples cover all three layers.
 - **Adoptable in existing code.** Wrap an existing module as a few coarse stages, record real traffic, promote
   recordings to examples, and split stages only where it pays.
 
+## Getting started
+
+[`samples/harvest`](samples/harvest/) is a toy product that uses the whole loop: an orchard's pick log is checked,
+grouped into baskets (a stage composed from generic operators) and weighed. Start with its
+[GRAPH.md](samples/harvest/GRAPH.md), then its [manifest](samples/harvest/graph.manifest.json) and
+[examples](samples/harvest/fixtures/).
+
+```bash
+dotnet test Seamlineage.slnx                                   # every example is a test
+
+cd samples/harvest
+dotnet run --project src/Harvest.Host -- manifest              # the product writes graph.manifest.json
+dotnet run --project ../../src/Seamlineage.Cli -- graph \
+  --manifest graph.manifest.json --fixtures fixtures --out GRAPH.md   # the shared CLI draws GRAPH.md
+dotnet run --project ../../src/Seamlineage.Cli -- check \
+  --manifest graph.manifest.json --fixtures fixtures --out GRAPH.md   # exit 1 if stale or a link is broken
+```
+
+The product's host also records runs and promotes them to examples:
+`run <input.json>` writes `recordings/<run>/NN-<edge>.jsonl`, and `promote <recording> <stage> <case>` turns one
+stage's recorded input and output into `fixtures/<stage>/<case>/`.
+
+The CLI reads only the manifest and the examples folder, so it serves a graph written in any language. Install it as
+a .NET tool (`dotnet pack src/Seamlineage.Cli`, then `dotnet tool install`), or build one self-contained file:
+`dotnet publish src/Seamlineage.Cli -c Release -r linux-x64` (or `win-x64`, `osx-arm64`, ...).
+
+| Package | What it holds |
+|---|---|
+| `Seamlineage.Contracts` | Stage, effect, envelope, state-store contract, graph builder, composed-stage steps, wire JSON, manifest emitter. BCL only. |
+| `Seamlineage.Operators` | The generic building blocks: group-by, order-by, session, split-small-groups. |
+| `Seamlineage.Docs` | GRAPH.md from a manifest (Mermaid), and the checks on a committed copy. BCL only. |
+| `Seamlineage.Testing` | Test helpers for any test framework: example runner with a JSON diff, "every stage has examples", generated files are current, assembly-reference checks. |
+| `Seamlineage.Hosting.InProc` | In-process runner, edge recorder, fixture promoter, and a host command line (`manifest`, `run`, `promote`). |
+| `Seamlineage.Cli` | The `seamlineage` command: `graph` and `check`. |
+
 ## Roadmap
 
 | Step | What | Status |
@@ -93,7 +128,7 @@ Code is the last resort, not the default. Examples cover all three layers.
 | 0 | Prove the approach on a real application (photo import: scan, group, detect exposure brackets), including an AI-authored stage reviewed from diagram and examples first | Done, in a private proving-ground repo |
 | 1 | Draft spec v0: manifest, examples, recordings, diagram rules | In progress ([`spec/`](spec/)) |
 | 2 | Conformance suite, starting with the building blocks (group-by, order-by, session, split-small-groups) | Next |
-| 3 | C# reference implementation and the shared CLI, extracted from the proving ground | Next |
+| 3 | C# reference implementation and the shared CLI, extracted from the proving ground | In progress: contracts, operators, test helpers, in-process host and the `seamlineage` CLI (`graph`, `check`) are done, dogfooded by [`samples/harvest`](samples/harvest/); publishing the packages is next |
 | 4 | Pipeline text and example tables in generated docs | Next |
 | 5 | Per-PR change diagram: only changed stages and their neighbours, highlighted | Planned |
 | 6 | Go implementation passing the conformance suite | Planned |

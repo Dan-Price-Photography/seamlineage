@@ -1,0 +1,8 @@
+{
+  "accepted": [
+    { "id": "p2", "tree": "row-1/tree-1", "variety": "gala", "weightGrams": 170, "pickedAt": "2026-09-12T09:01:00" }
+  ],
+  "rejected": [
+    { "id": "p1", "reason": "noWeight" }
+  ]
+}
