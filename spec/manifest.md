@@ -43,7 +43,7 @@ changed. Implementations must generate it deterministically (stable ordering, st
 | `description` | Required. One sentence saying what the stage **decides**, written for a reviewer. |
 | `input`, `output` | Type names, defined under `types`. |
 | `schemaVersion` | Version of the stage's output shape; bumped on breaking changes. |
-| `code` | Repository-relative path of the stage's implementation. Tools check it exists. |
+| `code` | Path of the stage's implementation, relative to the manifest's directory (usually the repository root). Tools check it exists. |
 
 A **composed** stage, built from generic operators, adds:
 

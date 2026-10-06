@@ -5,3 +5,4 @@ obj/
 TestResults/
 recordings/
 node_modules/
+artifacts/

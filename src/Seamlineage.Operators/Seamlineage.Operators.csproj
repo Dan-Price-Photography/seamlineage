@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Seamlineage operators: generic building blocks (group-by, order-by, session, split-small-groups) a stage can be composed from, each describing itself for the manifest.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Seamlineage.Contracts\Seamlineage.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

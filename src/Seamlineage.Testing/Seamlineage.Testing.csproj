@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Seamlineage test helpers, independent of any test framework: run fixtures/&lt;stage&gt;/&lt;case&gt; with a readable JSON diff, check every stage has examples, check generated files are current and links resolve, and check assembly references.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Seamlineage.Contracts\Seamlineage.Contracts.csproj" />
+    <ProjectReference Include="..\Seamlineage.Docs\Seamlineage.Docs.csproj" />
+  </ItemGroup>
+
+</Project>

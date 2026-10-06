@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Seamlineage contracts: stages, effects, envelopes, the graph builder, composed-stage steps, the JSON wire format and the manifest emitter. Base class library only.</Description>
+  </PropertyGroup>
+
+</Project>

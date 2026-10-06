@@ -1,0 +1,7 @@
+{
+  "baskets": [
+    { "key": "p1", "kind": "basket", "picks": 3, "grams": 500 },
+    { "key": "p4", "kind": "loose", "picks": 1, "grams": 200 }
+  ],
+  "totalGrams": 700
+}

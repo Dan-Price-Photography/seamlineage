@@ -1,0 +1,8 @@
+{
+  "accepted": [
+    { "id": "p2", "tree": "row-2/tree-5", "variety": "russet", "weightGrams": 140, "pickedAt": null }
+  ],
+  "rejected": [
+    { "id": "p1", "reason": "unknownVariety" }
+  ]
+}

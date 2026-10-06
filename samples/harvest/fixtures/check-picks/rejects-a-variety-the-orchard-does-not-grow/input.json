@@ -1,0 +1,6 @@
+{
+  "picks": [
+    { "id": "p1", "tree": "row-2/tree-4", "variety": "pear", "weightGrams": 200, "pickedAt": "2026-09-12T10:00:00" },
+    { "id": "p2", "tree": "row-2/tree-5", "variety": "russet", "weightGrams": 140, "pickedAt": null }
+  ]
+}

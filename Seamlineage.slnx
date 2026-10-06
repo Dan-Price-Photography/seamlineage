@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Seamlineage.Cli/Seamlineage.Cli.csproj" />
+    <Project Path="src/Seamlineage.Contracts/Seamlineage.Contracts.csproj" />
+    <Project Path="src/Seamlineage.Docs/Seamlineage.Docs.csproj" />
+    <Project Path="src/Seamlineage.Hosting.InProc/Seamlineage.Hosting.InProc.csproj" />
+    <Project Path="src/Seamlineage.Operators/Seamlineage.Operators.csproj" />
+    <Project Path="src/Seamlineage.Testing/Seamlineage.Testing.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Seamlineage.Tests/Seamlineage.Tests.csproj" />
+  </Folder>
+  <Folder Name="/samples/harvest/">
+    <Project Path="samples/harvest/src/Harvest/Harvest.csproj" />
+    <Project Path="samples/harvest/src/Harvest.Host/Harvest.Host.csproj" />
+    <Project Path="samples/harvest/tests/Harvest.Tests/Harvest.Tests.csproj" />
+  </Folder>
+</Solution>

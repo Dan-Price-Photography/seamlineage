@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Seamlineage in-process host: runs a graph in this process, records every edge, promotes recordings to fixtures, and writes the manifest.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Seamlineage.Contracts\Seamlineage.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

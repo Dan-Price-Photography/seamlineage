@@ -1,0 +1,13 @@
+{
+  "groups": [
+    {
+      "key": "p1",
+      "kind": "basket",
+      "picks": [
+        { "id": "p1", "tree": "row-1/tree-1", "variety": "gala", "weightGrams": 180, "pickedAt": "2026-09-12T09:00:00" },
+        { "id": "p2", "tree": "row-1/tree-2", "variety": "gala", "weightGrams": 150, "pickedAt": "2026-09-12T09:02:00" },
+        { "id": "p3", "tree": "row-1/tree-2", "variety": "gala", "weightGrams": 170, "pickedAt": "2026-09-12T09:05:00" }
+      ]
+    }
+  ]
+}

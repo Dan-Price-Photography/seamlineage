@@ -1,0 +1,48 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        run: dotnet build Seamlineage.slnx --configuration Release
+
+      # Dogfood the whole loop on the sample: the product's host writes the manifest, the shared CLI draws GRAPH.md
+      # from it. Publish both, so a stale file can be fixed by downloading the job's output.
+      - name: Regenerate the sample's graph.manifest.json and GRAPH.md
+        working-directory: samples/harvest
+        run: |
+          dotnet run --no-build --configuration Release --project src/Harvest.Host -- manifest
+          dotnet run --no-build --configuration Release --project ../../src/Seamlineage.Cli -- graph --manifest graph.manifest.json --fixtures fixtures --out GRAPH.md
+
+      - name: Upload regenerated files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated
+          path: |
+            samples/harvest/graph.manifest.json
+            samples/harvest/GRAPH.md
+
+      - name: Generated files are committed and current
+        run: git diff --exit-code -- samples/harvest/graph.manifest.json samples/harvest/GRAPH.md
+
+      - name: Test
+        run: dotnet test Seamlineage.slnx --no-build --configuration Release
+
+      # The CLI as teams without .NET get it: one self-contained, trimmed file.
+      - name: Single-file CLI checks the sample
+        run: |
+          dotnet publish src/Seamlineage.Cli --configuration Release --runtime linux-x64 --output artifacts/cli
+          ./artifacts/cli/seamlineage check --manifest samples/harvest/graph.manifest.json --fixtures samples/harvest/fixtures --out samples/harvest/GRAPH.md
