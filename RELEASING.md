@@ -34,6 +34,11 @@ release, publish a new version. (Pushing packages uses `--skip-duplicate`, so re
 
 ## Using the packages
 
+> **Currently private.** While the API is still changing, the packages on GitHub Packages are visible only to
+> members of the Dan-Price-Photography organisation. Everyone else can download the `.nupkg` files and CLI binaries
+> attached to each [GitHub Release](https://github.com/Dan-Price-Photography/seamlineage/releases), or build from
+> source.
+
 GitHub Packages requires authentication **even for public packages**. Create a GitHub personal access token
 (classic) with the `read:packages` scope, then add the source once:
 
