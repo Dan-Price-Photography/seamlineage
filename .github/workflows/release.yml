@@ -10,6 +10,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    # Only a v* tag may deploy to `release` (its deployment policy), and only an org admin may create, move or delete a
+    # v* tag (ruleset release-tags): so branch code cannot publish by tagging itself (goal fabbe098).
+    environment: release
     permissions:
       contents: write   # create the GitHub Release
       packages: write   # push to GitHub Packages with GITHUB_TOKEN
@@ -17,9 +20,9 @@ jobs:
       DOTNET_NOLOGO: true
       PACKAGES_SOURCE: https://nuget.pkg.github.com/Dan-Price-Photography/index.json
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
           dotnet-version: 10.0.x
 

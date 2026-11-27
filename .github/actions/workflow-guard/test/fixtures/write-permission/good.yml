@@ -1,0 +1,25 @@
+on: { push: { branches: [main] } }
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    environment: { name: production, url: https://example.org }
+    permissions:
+      id-token: write
+    steps: [ { run: echo } ]
+  verdict:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    permissions:
+      checks: write
+      contents: read
+    steps: [ { run: echo } ]
+  protected-paths:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    permissions:
+      pull-requests: write
+    steps: [ { run: echo } ]
+  readonly:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    permissions: read-all
+    steps: [ { run: echo } ]

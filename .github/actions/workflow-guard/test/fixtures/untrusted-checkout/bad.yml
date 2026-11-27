@@ -1,0 +1,14 @@
+on:
+  pull_request_target:
+    types: [opened]
+jobs:
+  build:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+      - run: gh pr checkout ${{ github.event.number }}

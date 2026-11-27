@@ -1,0 +1,20 @@
+on: pull_request
+env:
+  TOP: ${{ secrets.WORKFLOW_LEVEL }}
+jobs:
+  test:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    if: secrets.IN_IF != ''
+    steps:
+      - run: echo
+        env:
+          KEY: ${{ secrets.MY_KEY }}
+          ALT: ${{ secrets['indexed_key'] }}
+      - run: echo '${{ toJSON(secrets) }}'
+  login:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    steps:
+      - uses: Azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906
+  call-remote:
+    uses: some-org/workflows/.github/workflows/deploy.yml@0123456789abcdef0123456789abcdef01234567
+    secrets: inherit

@@ -1,0 +1,14 @@
+{
+  "name": "workflow-guard",
+  "private": true,
+  "description": "Fails a repository's workflows that hand secrets to branches, ask for write permissions, check out PR code in a privileged run, or reach the self-hosted fleet where they must not.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "node build.js",
+    "test": "node --test test/*.test.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "yaml": "2.9.1"
+  }
+}

@@ -1,0 +1,10 @@
+on: { push: { branches: [main] } }
+jobs:
+  release:
+    runs-on: ${{ fromJSON(vars.WINDOWS_RUNNER) }}
+    environment: production
+    steps: [ { run: echo } ]
+  hosted:
+    runs-on: ubuntu-latest
+    environment: production
+    steps: [ { run: echo } ]

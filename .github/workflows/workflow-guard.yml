@@ -1,0 +1,41 @@
+name: workflow-guard
+
+# Goal fabbe098. A public repository cannot read the private household-platform, so this runs a vendored copy of the guard
+# (.github/actions/workflow-guard, its source commit in SOURCE_SHA; to refresh it see that copy's README, "Vendored copy"),
+# and on a GitHub-hosted runner: fork pull requests must never reach the self-hosted fleet.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  workflow-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: The vendored guard comes from household-platform main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          sha="$(tr -d '[:space:]' < .github/actions/workflow-guard/SOURCE_SHA)"
+          if ! [[ "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::.github/actions/workflow-guard/SOURCE_SHA must hold one full commit SHA"; exit 1
+          fi
+          if ! gh api repos/Dan-Price-Photography/household-platform --silent 2>/dev/null; then
+            echo "household-platform cannot be read from this repository; skipping the freshness check"; exit 0
+          fi
+          status="$(gh api "repos/Dan-Price-Photography/household-platform/compare/main...$sha" --jq .status)" || {
+            echo "::error::SOURCE_SHA $sha is not a household-platform commit"; exit 1; }
+          case "$status" in
+            identical|behind) echo "SOURCE_SHA $sha is on household-platform main" ;;
+            *) echo "::error::SOURCE_SHA $sha is not an ancestor of household-platform main ($status)"; exit 1 ;;
+          esac
+
+      - uses: ./.github/actions/workflow-guard

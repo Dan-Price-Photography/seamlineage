@@ -1,0 +1,18 @@
+name: workflow-guard
+description: Fails a repository whose workflows hand secrets or write tokens to branches, check out pull request code in privileged runs, put environment jobs off the Linux fleet, use the fleet from a public repository, or use unpinned third-party actions. See README.md.
+inputs:
+  path:
+    description: Directory of workflow files to check.
+    required: false
+    default: .github/workflows
+  config:
+    description: The repository's allow-list (JSON). A missing file means no exemptions beyond the built-in ones.
+    required: false
+    default: .github/workflow-guard.json
+  visibility:
+    description: "The repository's visibility: public, private or internal. Public repositories may not use the self-hosted fleet."
+    required: false
+    default: ${{ github.event.repository.visibility }}
+runs:
+  using: node24
+  main: dist/index.js
