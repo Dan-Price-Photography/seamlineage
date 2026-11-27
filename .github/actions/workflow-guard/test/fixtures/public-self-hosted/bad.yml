@@ -1,0 +1,15 @@
+on: [pull_request, push]
+jobs:
+  linux:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    steps: [ { run: echo } ]
+  windows:
+    runs-on: ${{ fromJSON(vars.WINDOWS_RUNNER) }}
+    steps: [ { run: echo } ]
+  labels:
+    runs-on: [self-hosted, linux]
+    steps: [ { run: echo } ]
+  group:
+    runs-on:
+      group: Default
+    steps: [ { run: echo } ]

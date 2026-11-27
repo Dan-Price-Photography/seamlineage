@@ -1,0 +1,8 @@
+on: [pull_request, push]
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps: [ { run: echo } ]
+  matrix:
+    runs-on: [ubuntu-latest]
+    steps: [ { run: echo } ]

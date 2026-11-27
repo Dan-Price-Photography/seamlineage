@@ -1,0 +1,23 @@
+on: { push: { branches: [main] } }
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    environment: production
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+  build:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    steps:
+      - run: echo "${{ secrets.GITHUB_TOKEN }} ${{ github.token }}"
+      - run: echo "the word secrets.FOO outside an expression is only text"
+  call-local:
+    uses: ./.github/workflows/reusable.yml
+    secrets: inherit

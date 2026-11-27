@@ -1,0 +1,19 @@
+{
+  "$comment": "workflow-guard exemptions; each says why (.github/actions/workflow-guard/README.md, 'The allow-list')",
+  "allow": [
+    {
+      "rule": "write-permission",
+      "workflow": "release.yml",
+      "job": "release",
+      "match": "contents",
+      "reason": "Creates the GitHub Release. Runs only in the release environment, which only v* tags may deploy to, and only org admins may create v* tags (ruleset release-tags)."
+    },
+    {
+      "rule": "write-permission",
+      "workflow": "release.yml",
+      "job": "release",
+      "match": "packages",
+      "reason": "Pushes the NuGet packages to GitHub Packages. Same gate: the release environment (v* tags only) and the admin-only release-tags ruleset."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+on: push
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  plan:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    steps: [ { run: echo } ]
+  publish:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    permissions:
+      packages: write
+      contents: write
+    steps: [ { run: echo } ]
+  everything:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    permissions: write-all
+    steps: [ { run: echo } ]
+  not-verdict:
+    runs-on: ${{ fromJSON(vars.LINUX_RUNNER) }}
+    permissions:
+      checks: write
+    steps: [ { run: echo } ]
